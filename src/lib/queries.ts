@@ -112,10 +112,10 @@ export async function getHomeData(): Promise<HomeData> {
   }
 
   const mmSubs = h.multimediaCategories.map((s) => categories.find((c) => c.slug === s)).filter((c): c is Category => !!c);
-  let mmArticles = await db.articles.list({ ...PUBLISHED(), types: ["photo", "video"], take: 7 });
-  if (mmArticles.length < 3) {
-    const byCat = await db.articles.list({ ...PUBLISHED(), categories: h.multimediaCategories, take: 7 });
-    mmArticles = byCat.length >= 3 ? byCat : await getLatestArticles(7, [...used]);
+  let mmArticles = await db.articles.list({ ...PUBLISHED(), types: ["photo", "video"], take: 8 });
+  if (mmArticles.length < 4) {
+    const byCat = await db.articles.list({ ...PUBLISHED(), categories: h.multimediaCategories, take: 8 });
+    mmArticles = byCat.length >= 4 ? byCat : await getLatestArticles(8, [...used]);
   }
 
   const grid: CategoryBlock[] = [];

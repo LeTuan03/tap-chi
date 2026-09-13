@@ -1,12 +1,12 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useState } from "react";
 import type { Article, Category } from "@/lib/types";
 import ArticleCard from "./ArticleCard";
 
 export default function LatestPopularTabs({ latest, popular, categories }: { latest: Article[]; popular: Article[]; categories: Category[] }) {
   const [tab, setTab] = useState<"latest" | "popular">("latest");
-  const id = useId();
+  const id = "sidebar-tabs";
   return (
     <section className="tabs" aria-label="Tin mới nhất và đọc nhiều">
       <div className="tabs__nav" role="tablist">

@@ -59,6 +59,7 @@ img, video, iframe {
   height: auto;
   border: 0;
   vertical-align: middle;
+  border-radius: 0 !important;
 }
 
 button {

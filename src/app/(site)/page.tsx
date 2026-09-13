@@ -8,6 +8,7 @@ import JsonLd from "@/components/site/JsonLd";
 import SectionHead from "@/components/site/SectionHead";
 import Sidebar from "@/components/site/Sidebar";
 import SpotlightSlider from "@/components/site/SpotlightSlider";
+import MultimediaSection from "@/components/site/MultimediaSection";
 import { db } from "@/lib/db";
 import { getCategories, getHomeData } from "@/lib/queries";
 import { itemListJsonLd, toAbs } from "@/lib/seo";
@@ -127,40 +128,11 @@ export default async function HomePage() {
       </section>
 
       {/* ===== 4. Đa Phương Tiện (Multimedia Dark Section) ===== */}
-      {data.multimedia.articles.length > 0 && (
-        <section className="multimedia" aria-label="Multimedia - Đa phương tiện">
-          <div className="container">
-            <div className="multimedia__header">
-              <div className="multimedia__brand">
-                <span className="multimedia__dot" />
-                <h2 className="multimedia__title">
-                  <Link href={data.multimedia.subs[0] ? categoryPath(data.multimedia.subs[0]) : "/video"}>Multimedia Làng nghề</Link>
-                </h2>
-              </div>
-              {data.multimedia.subs.length > 0 && (
-                <div className="multimedia__subs">
-                  {data.multimedia.subs.map((s) => (
-                    <Link key={s.slug} href={categoryPath(s, categories)} className="multimedia__sub-pill">
-                      {s.name}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className="multimedia__body">
-              <div className="multimedia__lead">
-                <ArticleCard article={data.multimedia.articles[0]} categories={categories} sizes="(max-width: 767px) 100vw, 620px" descClamp={3} className="card--dark-lead" />
-              </div>
-              <div className="multimedia__grid">
-                {data.multimedia.articles.slice(1, 7).map((a) => (
-                  <ArticleCard key={a.id} article={a} categories={categories} sizes="(max-width: 767px) 50vw, 290px" showDesc={false} className="card--dark-sub" />
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
+      <MultimediaSection
+        articles={data.multimedia.articles}
+        subs={data.multimedia.subs}
+        categories={categories}
+      />
 
       {/* ===== 5. Lưới Chuyên Mục Sâu + Sidebar ===== */}
       <div className="grid-section">
