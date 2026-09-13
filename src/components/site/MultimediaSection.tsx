@@ -49,7 +49,6 @@ export default function MultimediaSection({
         {/* Header với thương hiệu Multimedia và các tab điều hướng */}
         <div className="multimedia__header">
           <div className="multimedia__brand">
-            <span className="multimedia__dot" />
             <h2 className="multimedia__title">
               <Link href={subs[0] ? categoryPath(subs[0], categories) : "/video"}>
                 Multimedia Làng nghề
