@@ -1,0 +1,11 @@
+node_modules
+.next
+out
+*.log
+.env*
+.DS_Store
+tsconfig.tsbuildinfo
+next-env.d.ts
+
+prisma/*.db*
+!.env.example

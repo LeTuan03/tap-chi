@@ -1,0 +1,131 @@
+{
+  "siteName": "Tạp chí Làng nghề Việt Nam",
+  "shortName": "Làng nghề Việt",
+  "tagline": "Tạp chí điện tử Làng nghề Việt Nam",
+  "description": "Tạp chí điện tử Làng nghề Việt Nam - Cơ quan của Hiệp hội Làng nghề Việt Nam: tin tức làng nghề, nghệ nhân, nông thôn mới, OCOP, khuyến công, khuyến nông, văn hóa xã hội.",
+  "keywords": [
+    "làng nghề",
+    "nghệ nhân",
+    "OCOP",
+    "nông thôn mới",
+    "khuyến công",
+    "khuyến nông",
+    "tạp chí làng nghề việt nam"
+  ],
+  "logo": "/images/logo.png",
+  "logoBanner": "/images/logo-banner.jpg",
+  "logoFooter": "/images/logo-footer.jpg",
+  "ogImage": "/images/logo.png",
+  "issn": "ISSN 2734 9810",
+  "editorInChief": "Nhà báo Nguyễn Văn Vũ",
+  "address": "Số 46 Tăng Bạt Hổ, phường Hai Bà Trưng, Hà Nội",
+  "email": "tapchilangnghevietnam@gmail.com",
+  "phone": "024.3869.2173",
+  "hotline": "0917.338.089",
+  "license": "Giấy phép hoạt động báo chí: 79/GP-Bộ TTTT cấp ngày 27/2/2020",
+  "adsContact": {
+    "name": "Hoàng Ngọc Mai",
+    "phone": "0387748195"
+  },
+  "copyright": "Việc sử dụng nội dung đăng tải trên Tạp chí Làng nghề Việt Nam phải có sự đồng ý bằng văn bản của Tạp chí điện tử Làng nghề Việt Nam.",
+  "socials": {
+    "facebook": "https://www.facebook.com/tapchilangnghevietnam",
+    "youtube": "https://www.youtube.com/@tapchilangnghevietnam",
+    "tiktok": "https://www.tiktok.com/@langnghevietnam",
+    "twitter": ""
+  },
+  "googleSiteVerification": "",
+  "gtmId": "",
+  "partnerLink": {
+    "url": "https://ocopvietnam.com.vn/",
+    "image": "/images/logo-ocop-vietnam.png",
+    "label": "OCOP Việt Nam"
+  },
+  "weather": [
+    {
+      "city": "Hà Nội",
+      "temp": 27,
+      "icon": "10n"
+    },
+    {
+      "city": "Đà Nẵng",
+      "temp": 27,
+      "icon": "04n"
+    },
+    {
+      "city": "TP Hồ Chí Minh",
+      "temp": 26,
+      "icon": "10n"
+    },
+    {
+      "city": "Thừa Thiên Huế",
+      "temp": 27,
+      "icon": "04n"
+    }
+  ],
+  "home": {
+    "tickerCount": 5,
+    "coverListCount": 5,
+    "spotlightCount": 10,
+    "breakingCount": 10,
+    "stageCategories": [
+      "lang-nghe-nghe-nhan",
+      "nong-thon-moi",
+      "khuyen-nong",
+      "kinh-te"
+    ],
+    "gridCategories": [
+      "ocop",
+      "khuyen-cong",
+      "van-hoa-xa-hoi",
+      "moi-truong",
+      "nghien-cuu-trao-doi",
+      "xuc-tien-thuong-mai",
+      "du-lich-lang-nghe",
+      "suc-khoe-doi-song",
+      "ban-doc-va-toa-soan",
+      "khoi-nghiep",
+      "dao-tao-nghe"
+    ],
+    "multimediaCategories": [
+      "video",
+      "emagazine",
+      "infographic",
+      "anh"
+    ]
+  },
+  "ads": {
+    "sidebar": [
+      {
+        "image": "https://langngheviet.com.vn/stores/ads_data/2026/062026/17/15/z7946238265149-de45e5c0970de676870fbd630a52517220260617152159.jpg",
+        "link": "",
+        "alt": "xet-tuyen-dai-hoc"
+      },
+      {
+        "image": "https://langngheviet.com.vn/stores/ads_data/2026/062026/17/15/so-2526-tap-chi-lang-nghe-viet-nam-2026-6420260617152150.jpg",
+        "link": "",
+        "alt": "gex"
+      },
+      {
+        "image": "https://langngheviet.com.vn/stores/ads_data/2026/062026/17/15/so-2526-tap-chi-lang-nghe-viet-nam-2026-220260617152034.jpg",
+        "link": "",
+        "alt": "so-2526-tap-chi-lang-nghe-viet-nam-2026-2"
+      },
+      {
+        "image": "https://langngheviet.com.vn/stores/ads_data/2026/062026/17/15/so-2526-tap-chi-lang-nghe-viet-nam-2026-5320260617152108.jpg",
+        "link": "",
+        "alt": "so-2526-tap-chi-lang-nghe-viet-nam-2026-47"
+      },
+      {
+        "image": "https://langngheviet.com.vn/stores/ads_data/2026/062026/17/15/so-2526-tap-chi-lang-nghe-viet-nam-2026-6320260617152141.jpg",
+        "link": "",
+        "alt": "so-2526-tap-chi-lang-nghe-viet-nam-2026-63"
+      },
+      {
+        "image": "https://langngheviet.com.vn/stores/ads_data/2026/062026/17/15/so-2526-tap-chi-lang-nghe-viet-nam-2026-6320260617152141.jpg",
+        "link": "",
+        "alt": "so-2526-tap-chi-lang-nghe-viet-nam-2026-63"
+      }
+    ]
+  }
+}

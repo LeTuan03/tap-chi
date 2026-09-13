@@ -1,0 +1,194 @@
+[
+  {
+    "slug": "tin-tuc",
+    "name": "Tin tức",
+    "parent": null,
+    "description": "Tin tức thời sự mới nhất về làng nghề, nông thôn mới, OCOP, khuyến công, khuyến nông trên cả nước.",
+    "menu": "main",
+    "order": 1
+  },
+  {
+    "slug": "lang-nghe-nghe-nhan",
+    "name": "Làng nghề, nghệ nhân",
+    "parent": null,
+    "description": "Câu chuyện làng nghề truyền thống, nghệ nhân, tinh hoa thủ công mỹ nghệ Việt Nam: bảo tồn, phát triển và hội nhập.",
+    "menu": "main",
+    "order": 2
+  },
+  {
+    "slug": "nong-thon-moi",
+    "name": "Nông thôn mới",
+    "parent": null,
+    "description": "Tin tức, bài viết mới nhất về nông thôn mới trên Tạp chí điện tử Làng nghề Việt Nam.",
+    "menu": "main",
+    "order": 3
+  },
+  {
+    "slug": "ocop",
+    "name": "OCOP",
+    "parent": null,
+    "description": "Tin tức, bài viết mới nhất về OCOP trên Tạp chí điện tử Làng nghề Việt Nam.",
+    "menu": "main",
+    "order": 4
+  },
+  {
+    "slug": "khuyen-cong",
+    "name": "Khuyến công",
+    "parent": null,
+    "description": "Tin tức, bài viết mới nhất về khuyến công trên Tạp chí điện tử Làng nghề Việt Nam.",
+    "menu": "main",
+    "order": 5
+  },
+  {
+    "slug": "khuyen-nong",
+    "name": "Khuyến nông",
+    "parent": null,
+    "description": "Tin tức, bài viết mới nhất về khuyến nông trên Tạp chí điện tử Làng nghề Việt Nam.",
+    "menu": "main",
+    "order": 6
+  },
+  {
+    "slug": "van-hoa-xa-hoi",
+    "name": "Văn hóa - Xã hội",
+    "parent": null,
+    "description": "Tin tức, bài viết mới nhất về văn hóa - xã hội trên Tạp chí điện tử Làng nghề Việt Nam.",
+    "menu": "main",
+    "order": 7
+  },
+  {
+    "slug": "moi-truong",
+    "name": "Môi trường",
+    "parent": null,
+    "description": "Tin tức, bài viết mới nhất về môi trường trên Tạp chí điện tử Làng nghề Việt Nam.",
+    "menu": "main",
+    "order": 8
+  },
+  {
+    "slug": "nghien-cuu-trao-doi",
+    "name": "Nghiên cứu trao đổi",
+    "parent": null,
+    "description": "Tin tức, bài viết mới nhất về nghiên cứu trao đổi trên Tạp chí điện tử Làng nghề Việt Nam.",
+    "menu": "main",
+    "order": 9
+  },
+  {
+    "slug": "video",
+    "name": "Video",
+    "parent": null,
+    "description": "Tin tức, bài viết mới nhất về video trên Tạp chí điện tử Làng nghề Việt Nam.",
+    "menu": "main",
+    "order": 10
+  },
+  {
+    "slug": "ban-doc-va-toa-soan",
+    "name": "Bạn đọc và tòa soạn",
+    "parent": null,
+    "description": "Tin tức, bài viết mới nhất về bạn đọc và tòa soạn trên Tạp chí điện tử Làng nghề Việt Nam.",
+    "menu": "more",
+    "order": 11
+  },
+  {
+    "slug": "du-lich-lang-nghe",
+    "name": "Du lịch làng nghề",
+    "parent": null,
+    "description": "Tin tức, bài viết mới nhất về du lịch làng nghề trên Tạp chí điện tử Làng nghề Việt Nam.",
+    "menu": "more",
+    "order": 12
+  },
+  {
+    "slug": "khoi-nghiep",
+    "name": "Khởi nghiệp",
+    "parent": null,
+    "description": "Tin tức, bài viết mới nhất về khởi nghiệp trên Tạp chí điện tử Làng nghề Việt Nam.",
+    "menu": "more",
+    "order": 13
+  },
+  {
+    "slug": "doc-tap-chi-in",
+    "name": "Đọc Tạp chí in",
+    "parent": null,
+    "description": "Tin tức, bài viết mới nhất về đọc tạp chí in trên Tạp chí điện tử Làng nghề Việt Nam.",
+    "menu": "more",
+    "order": 14
+  },
+  {
+    "slug": "kinh-te",
+    "name": "Kinh tế",
+    "parent": null,
+    "description": "Tin tức, bài viết mới nhất về kinh tế trên Tạp chí điện tử Làng nghề Việt Nam.",
+    "menu": "more",
+    "order": 15
+  },
+  {
+    "slug": "dao-tao-nghe",
+    "name": "Đào tạo nghề",
+    "parent": null,
+    "description": "Tin tức, bài viết mới nhất về đào tạo nghề trên Tạp chí điện tử Làng nghề Việt Nam.",
+    "menu": "more",
+    "order": 16
+  },
+  {
+    "slug": "suc-khoe-doi-song",
+    "name": "Sức khỏe - Đời sống",
+    "parent": null,
+    "description": "Tin tức, bài viết mới nhất về sức khỏe - đời sống trên Tạp chí điện tử Làng nghề Việt Nam.",
+    "menu": "more",
+    "order": 17
+  },
+  {
+    "slug": "thong-tin-quang-cao",
+    "name": "Thông tin quảng cáo",
+    "parent": null,
+    "description": "Tin tức, bài viết mới nhất về thông tin quảng cáo trên Tạp chí điện tử Làng nghề Việt Nam.",
+    "menu": "more",
+    "order": 18
+  },
+  {
+    "slug": "xuc-tien-thuong-mai",
+    "name": "Xúc tiến thương mại",
+    "parent": null,
+    "description": "Tin tức, bài viết mới nhất về xúc tiến thương mại trên Tạp chí điện tử Làng nghề Việt Nam.",
+    "menu": "more",
+    "order": 19
+  },
+  {
+    "slug": "emagazine",
+    "name": "Emagazine",
+    "parent": null,
+    "description": "Tin tức, bài viết mới nhất về emagazine trên Tạp chí điện tử Làng nghề Việt Nam.",
+    "menu": "hidden",
+    "order": 20
+  },
+  {
+    "slug": "infographic",
+    "name": "Infographic",
+    "parent": null,
+    "description": "Tin tức, bài viết mới nhất về infographic trên Tạp chí điện tử Làng nghề Việt Nam.",
+    "menu": "hidden",
+    "order": 21
+  },
+  {
+    "slug": "anh",
+    "name": "Ảnh",
+    "parent": null,
+    "description": "Tin tức, bài viết mới nhất về ảnh trên Tạp chí điện tử Làng nghề Việt Nam.",
+    "menu": "hidden",
+    "order": 22
+  },
+  {
+    "slug": "tho-lang-nghe-tho-nghe-nhan",
+    "name": "Thơ làng nghề, thơ nghệ nhân",
+    "parent": "van-hoa-xa-hoi",
+    "description": "Tin tức, bài viết mới nhất về thơ làng nghề, thơ nghệ nhân trên Tạp chí điện tử Làng nghề Việt Nam.",
+    "menu": "main",
+    "order": 23
+  },
+  {
+    "slug": "van-hien-ha-thanh",
+    "name": "Văn hiến Hà Thành",
+    "parent": "van-hoa-xa-hoi",
+    "description": "Tin tức, bài viết mới nhất về văn hiến hà thành trên Tạp chí điện tử Làng nghề Việt Nam.",
+    "menu": "main",
+    "order": 24
+  }
+]
