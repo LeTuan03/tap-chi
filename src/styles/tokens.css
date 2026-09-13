@@ -1,0 +1,81 @@
+/* =========================================================
+   DESIGN TOKENS - TẠP CHÍ LÀNG NGHỀ VIỆT NAM
+   Phong cách: Modern Heritage & Craft Editorial
+   ========================================================= */
+
+:root {
+  /* --- BẢNG MÀU DI SẢN (HERITAGE COLOR PALETTE) --- */
+  /* Đỏ Chu Sa / Sơn Mài (Primary) */
+  --color-primary: #9b2318;
+  --color-primary-dark: #7a1b12;
+  --color-primary-light: #b83226;
+  --color-primary-soft: #fbf0ee;
+
+  /* Vàng Hoàng Kim / Đồng Thau (Accent Gold) */
+  --color-accent-gold: #c59b27;
+  --color-accent-gold-dark: #a07d1c;
+  --color-accent-gold-light: #dfb643;
+  --color-accent-gold-soft: #fcf8ee;
+
+  /* Xanh Men Gốm / Rêu Phong (Accent Green - OCOP / Nông thôn) */
+  --color-accent-green: #2d6a4f;
+  --color-accent-green-dark: #1b4332;
+  --color-accent-green-light: #40916c;
+  --color-accent-green-soft: #eaf4ef;
+
+  /* Xanh Lam Báo Chí (Accent Blue) */
+  --color-accent-blue: #1e5a8a;
+  --color-accent-blue-soft: #edf4fa;
+
+  /* Nền và Bề Mặt (Surfaces) */
+  --color-bg-body: #ffffff;
+  --color-bg-warm: #faf7f2;       /* Nền giấy Dó ấm dịu */
+  --color-bg-soft: #f5f4f0;       /* Khối nền phân tách nhẹ */
+  --color-bg-card: #ffffff;
+  --color-bg-dark: #131619;       /* Nền than chì cho Multimedia */
+  --color-bg-dark-card: #1f2327;
+  --color-bg-dark-soft: #2b3035;
+
+  /* Màu Chữ Mực Tàu (Typography Colors) */
+  --color-text-main: #1c1917;     /* Mực đen than đá, độ tương phản êm dịu */
+  --color-text-body: #374151;     /* Chữ thân bài */
+  --color-text-muted: #6b7280;    /* Chữ phụ, mô tả ngắn */
+  --color-text-light: #9ca3af;    /* Meta, ngày tháng */
+  --color-text-inverse: #ffffff;  /* Chữ trên nền tối */
+  --color-text-inverse-muted: #d1d5db;
+
+  /* Đường Kẻ & Viền (Borders) */
+  --color-border: #e5e7eb;
+  --color-border-subtle: #f0ede6;
+  --color-border-dark: #2f343a;
+  --color-border-gold: rgba(197, 155, 39, 0.35);
+
+  /* --- TYPOGRAPHY SCALE --- */
+  --font-serif: var(--font-lora), Georgia, "Times New Roman", serif;
+  --font-sans: var(--font-be-vietnam), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  /* --- KHUNG & KHOẢNG CÁCH (LAYOUT & SPACING) --- */
+  --container-max: 1260px;
+  --container-gutter: 20px;
+  --header-height: 48px;
+
+  /* Bo Góc (Border Radii) */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+
+  /* Bóng Đổ (Shadows & Elevation) */
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+  --shadow-sm: 0 2px 8px -1px rgba(0, 0, 0, 0.06), 0 1px 3px -1px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 6px 16px -2px rgba(0, 0, 0, 0.08), 0 3px 6px -2px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 12px 28px -4px rgba(0, 0, 0, 0.12), 0 4px 10px -2px rgba(0, 0, 0, 0.06);
+  --shadow-cover: 0 20px 35px -10px rgba(0, 0, 0, 0.25);
+
+  /* Hiệu Ứng Chuyển Động (Transitions) */
+  --transition-fast: 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+}

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Category } from "@/lib/types";
 import { categoryPath } from "@/lib/utils";
+import { ChevronDownIcon, MenuIcon } from "./Icons";
 import NavToggle from "./NavToggle";
 
 export default function MainNav({ categories, siteName }: { categories: Category[]; siteName: string }) {
@@ -16,8 +17,8 @@ export default function MainNav({ categories, siteName }: { categories: Category
         <span className="mainnav__brand sr-only">{siteName}</span>
         <ul className="mainnav__list" id="main-nav-list">
           <li className="mainnav__item mainnav__item--home">
-            <Link href="/" aria-label="Trang chủ" title="Trang chủ">
-              <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
+            <Link href="/" aria-label="Trang chủ" title="Trang chủ" className="mainnav__link mainnav__link--home">
+              <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
                 <path d="M12 3 2 12h3v8h5v-6h4v6h5v-8h3L12 3z" />
               </svg>
             </Link>
@@ -25,12 +26,15 @@ export default function MainNav({ categories, siteName }: { categories: Category
           {main.map((c) => {
             const subs = childrenOf(c.slug);
             return (
-              <li className="mainnav__item" key={c.slug}>
-                <Link href={categoryPath(c)}>{c.name}</Link>
+              <li className={`mainnav__item ${subs.length > 0 ? "has-sub" : ""}`} key={c.slug}>
+                <Link href={categoryPath(c)} className="mainnav__link">
+                  <span>{c.name}</span>
+                  {subs.length > 0 && <ChevronDownIcon className="mainnav__arrow" />}
+                </Link>
                 {subs.length > 0 && (
                   <ul className="mainnav__sub">
                     {subs.map((s) => (
-                      <li key={s.slug}>
+                      <li key={s.slug} className="mainnav__sub-item">
                         <Link href={categoryPath(s, categories)}>{s.name}</Link>
                       </li>
                     ))}
@@ -41,15 +45,21 @@ export default function MainNav({ categories, siteName }: { categories: Category
           })}
           {more.length > 0 && (
             <li className="mainnav__item mainnav__more">
-              <button type="button" className="mainnav__more-btn" aria-haspopup="true" aria-label="Chuyên mục khác">
-                Chuyên mục khác
+              <button type="button" className="mainnav__more-btn" aria-haspopup="true" aria-label="Tất cả chuyên mục">
+                <MenuIcon className="mainnav__more-icon" />
+                <span>Thêm</span>
               </button>
               <div className="mainnav__more-panel">
-                {more.map((c) => (
-                  <Link key={c.slug} href={categoryPath(c)}>
-                    {c.name}
-                  </Link>
-                ))}
+                <div className="mainnav__more-header">
+                  <span>Tất cả chuyên mục</span>
+                </div>
+                <div className="mainnav__more-grid">
+                  {more.map((c) => (
+                    <Link key={c.slug} href={categoryPath(c)} className="mainnav__more-item">
+                      {c.name}
+                    </Link>
+                  ))}
+                </div>
               </div>
             </li>
           )}

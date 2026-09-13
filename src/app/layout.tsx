@@ -1,14 +1,21 @@
 import type { Metadata, Viewport } from "next";
-import { Noto_Sans } from "next/font/google";
+import { Lora, Be_Vietnam_Pro } from "next/font/google";
 import { db } from "@/lib/db";
 import { baseMetadata } from "@/lib/seo";
 import "./globals.css";
 
-const notoSans = Noto_Sans({
+const lora = Lora({
   subsets: ["latin", "vietnamese"],
-  weight: ["400", "500", "700"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
-  variable: "--font-sans",
+  variable: "--font-lora",
+});
+
+const beVietnamPro = Be_Vietnam_Pro({
+  subsets: ["latin", "vietnamese"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+  variable: "--font-be-vietnam",
 });
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -19,13 +26,14 @@ export async function generateMetadata(): Promise<Metadata> {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#ffffff",
+  themeColor: "#9b2318",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="vi" className={notoSans.variable}>
+    <html lang="vi" className={`${lora.variable} ${beVietnamPro.variable}`}>
       <body>{children}</body>
     </html>
   );
 }
+

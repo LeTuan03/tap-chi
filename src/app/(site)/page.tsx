@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import ArticleCard from "@/components/site/ArticleCard";
 import CoverSlider from "@/components/site/CoverSlider";
+import { BookOpenIcon } from "@/components/site/Icons";
 import JsonLd from "@/components/site/JsonLd";
 import SectionHead from "@/components/site/SectionHead";
 import Sidebar from "@/components/site/Sidebar";
@@ -17,7 +18,7 @@ export const revalidate = 60;
 export async function generateMetadata(): Promise<Metadata> {
   const s = await db.settings.get();
   return {
-    title: { absolute: `${s.siteName} - Tin tức làng nghề, nghệ nhân, OCOP, nông thôn mới` },
+    title: { absolute: `${s.siteName} - Tạp chí Điện tử Di sản & Làng nghề Việt Nam` },
     description: s.description,
     alternates: { canonical: "/" },
     openGraph: {
@@ -40,54 +41,83 @@ export default async function HomePage() {
     <>
       <JsonLd data={itemListJsonLd(data.breaking, "Tin mới nhất")} />
 
-      {/* ===== Cover ===== */}
-      <section className="cover" aria-label="Tin tiêu điểm">
-        <CoverSlider articles={data.featured} categories={categories} />
-        <div className="cover-list">
-          {data.coverList.map((a, i) => (
-            <ArticleCard key={a.id} article={a} categories={categories} sizes="200px" showDesc={false} priority={i === 0} />
-          ))}
+      {/* ===== 1. Khối Tiêu Điểm Bất Đối Xứng (Cover Hero Showcase) ===== */}
+      <section className="cover" aria-label="Tin tiêu điểm tạp chí">
+        {/* Cột 1: Slider Tiêu điểm lớn */}
+        <div className="cover__main">
+          <CoverSlider articles={data.featured} categories={categories} />
         </div>
-        <div className="epaper-box">
-          <SectionHead title="Tạp chí in" href={epaperCat ? categoryPath(epaperCat) : "/doc-tap-chi-in"} />
+
+        {/* Cột 2: Cột dòng chảy tin tức */}
+        <div className="cover-list" aria-label="Dòng thời sự làng nghề">
+          <div className="cover-list__header">
+            <span className="cover-list__tag">Thời sự Làng nghề</span>
+          </div>
+          <div className="cover-list__items">
+            {data.coverList.map((a, i) => (
+              <ArticleCard key={a.id} article={a} categories={categories} sizes="220px" showDesc={false} priority={i === 0} className="card--compact" />
+            ))}
+          </div>
+        </div>
+
+        {/* Cột 3: Tạp chí in E-Paper 3D Showcase */}
+        <div className="epaper-box" aria-label="Ấn phẩm tạp chí in">
+          <div className="epaper-box__header">
+            <span className="epaper-box__badge">Ấn phẩm kỳ này</span>
+            <SectionHead title="Tạp chí in" href={epaperCat ? categoryPath(epaperCat) : "/doc-tap-chi-in"} />
+          </div>
           {data.epaper && (
-            <div className="epaper-box__frame">
-              <a href={data.epaper.link} target="_blank" rel="noopener" title={data.epaper.title}>
-                <Image src={data.epaper.cover} alt={data.epaper.title} fill sizes="280px" />
+            <div className="epaper-box__body">
+              <a href={data.epaper.link} target="_blank" rel="noopener" title={data.epaper.title} className="epaper-box__link">
+                <div className="epaper-box__frame">
+                  <Image src={data.epaper.cover} alt={data.epaper.title} fill sizes="280px" className="epaper-box__img" priority />
+                </div>
+                <h4 className="epaper-box__title clamp-2">{data.epaper.title}</h4>
+                <div className="epaper-box__cta">
+                  <BookOpenIcon className="epaper-box__cta-icon" />
+                  <span>Đọc ấn phẩm số</span>
+                </div>
               </a>
             </div>
           )}
         </div>
       </section>
 
-      {/* ===== Nổi bật ===== */}
+      {/* ===== 2. Nổi Bật / Tinh Hoa Nghệ Nhân (Spotlight Carousel) ===== */}
       {data.spotlight.length > 0 && (
-        <section className="spotlight" aria-label="Nổi bật">
-          <SectionHead title="Nổi bật" />
+        <section className="spotlight" aria-label="Tinh hoa làng nghề nổi bật">
+          <SectionHead title="Tinh hoa Nghệ nhân & Làng nghề" />
           <SpotlightSlider articles={data.spotlight} categories={categories} />
         </section>
       )}
 
-      {/* ===== Tin mới + 4 chuyên mục ===== */}
-      <section className="stage" aria-label="Tin mới và chuyên mục">
+      {/* ===== 3. Tin Nóng & Các Chuyên Mục Trọng Điểm (Stage Sections) ===== */}
+      <section className="stage" aria-label="Tin mới và chuyên mục trọng điểm">
         <div className="breaking">
-          {data.breaking.map((a) => (
-            <ArticleCard key={a.id} article={a} categories={categories} sizes="(max-width: 767px) 100vw, 240px" descClamp={3} />
-          ))}
+          <div className="breaking__header">
+            <span className="breaking__badge">Dòng sự kiện</span>
+            <h3 className="breaking__title">Mới cập nhật</h3>
+          </div>
+          <div className="breaking__list">
+            {data.breaking.map((a) => (
+              <ArticleCard key={a.id} article={a} categories={categories} sizes="(max-width: 767px) 100vw, 240px" descClamp={3} className="card--breaking" />
+            ))}
+          </div>
         </div>
-        <div>
+
+        <div className="stage__blocks">
           {data.stage.map((block) => (
             <section className="box-type1" key={block.category.slug} aria-label={block.category.name}>
               <SectionHead title={block.category.name} href={categoryPath(block.category)} subs={block.subs} categories={categories} />
               {block.articles[0] && (
                 <div className="box-type1__lead">
-                  <ArticleCard article={block.articles[0]} category={block.category} sizes="200px" descClamp={3} />
+                  <ArticleCard article={block.articles[0]} category={block.category} sizes="(max-width: 767px) 100vw, 340px" descClamp={3} className="card--lead" />
                 </div>
               )}
               {block.articles.length > 1 && (
                 <div className="box-type1__grid">
                   {block.articles.slice(1).map((a) => (
-                    <ArticleCard key={a.id} article={a} category={block.category} showDesc={false} />
+                    <ArticleCard key={a.id} article={a} category={block.category} showDesc={false} className="card--secondary" />
                   ))}
                 </div>
               )}
@@ -96,31 +126,35 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ===== Multimedia ===== */}
+      {/* ===== 4. Đa Phương Tiện (Multimedia Dark Section) ===== */}
       {data.multimedia.articles.length > 0 && (
-        <section className="multimedia" aria-label="Multimedia">
+        <section className="multimedia" aria-label="Multimedia - Đa phương tiện">
           <div className="container">
-            <div className="section-head">
-              <h2 className="section-head__title">
-                <Link href={data.multimedia.subs[0] ? categoryPath(data.multimedia.subs[0]) : "/video"}>Multimedia</Link>
-              </h2>
+            <div className="multimedia__header">
+              <div className="multimedia__brand">
+                <span className="multimedia__dot" />
+                <h2 className="multimedia__title">
+                  <Link href={data.multimedia.subs[0] ? categoryPath(data.multimedia.subs[0]) : "/video"}>Multimedia Làng nghề</Link>
+                </h2>
+              </div>
               {data.multimedia.subs.length > 0 && (
                 <div className="multimedia__subs">
                   {data.multimedia.subs.map((s) => (
-                    <Link key={s.slug} href={categoryPath(s, categories)}>
+                    <Link key={s.slug} href={categoryPath(s, categories)} className="multimedia__sub-pill">
                       {s.name}
                     </Link>
                   ))}
                 </div>
               )}
             </div>
+
             <div className="multimedia__body">
               <div className="multimedia__lead">
-                <ArticleCard article={data.multimedia.articles[0]} categories={categories} sizes="(max-width: 767px) 100vw, 580px" descClamp={3} />
+                <ArticleCard article={data.multimedia.articles[0]} categories={categories} sizes="(max-width: 767px) 100vw, 620px" descClamp={3} className="card--dark-lead" />
               </div>
               <div className="multimedia__grid">
                 {data.multimedia.articles.slice(1, 7).map((a) => (
-                  <ArticleCard key={a.id} article={a} categories={categories} sizes="(max-width: 767px) 50vw, 275px" showDesc={false} />
+                  <ArticleCard key={a.id} article={a} categories={categories} sizes="(max-width: 767px) 50vw, 290px" showDesc={false} className="card--dark-sub" />
                 ))}
               </div>
             </div>
@@ -128,22 +162,26 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* ===== Lưới chuyên mục + sidebar ===== */}
+      {/* ===== 5. Lưới Chuyên Mục Sâu + Sidebar ===== */}
       <div className="grid-section">
-        <div>
+        <div className="grid-section__main">
           {data.grid.map((block) => (
             <section className="box-type2" key={block.category.slug} aria-label={block.category.name}>
               <SectionHead title={block.category.name} href={categoryPath(block.category)} subs={block.subs} categories={categories} />
-              {block.articles[0] && (
-                <div className="box-type2__lead">
-                  <ArticleCard article={block.articles[0]} category={block.category} sizes="(max-width: 767px) 100vw, 420px" descClamp={3} />
+              <div className="box-type2__content">
+                {block.articles[0] && (
+                  <div className="box-type2__lead">
+                    <ArticleCard article={block.articles[0]} category={block.category} sizes="(max-width: 767px) 100vw, 420px" descClamp={3} className="card--lead" />
+                  </div>
+                )}
+                <div className="box-type2__list">
+                  {block.articles.slice(1).map((a) => (
+                    <div className="box-type2__row" key={a.id}>
+                      <ArticleCard article={a} category={block.category} showDesc={false} className="card--horizontal" />
+                    </div>
+                  ))}
                 </div>
-              )}
-              {block.articles.slice(1).map((a) => (
-                <div className="box-type2__row" key={a.id}>
-                  <ArticleCard article={a} category={block.category} showDesc={false} />
-                </div>
-              ))}
+              </div>
             </section>
           ))}
         </div>
