@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { getSiteUrl } from "@/lib/seo";
+import { articlePath } from "@/lib/utils";
 
 export const revalidate = 300;
 
@@ -16,7 +17,7 @@ export async function GET() {
   const urls = recent
     .map(
       (r) => `  <url>
-    <loc>${base}/${r.slug}-${r.id}.html</loc>
+    <loc>${base}${articlePath(r)}</loc>
     <news:news>
       <news:publication>
         <news:name>${esc(settings.siteName)}</news:name>

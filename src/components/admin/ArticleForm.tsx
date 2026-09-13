@@ -99,7 +99,7 @@ export default function ArticleForm({ id }: { id?: number }) {
   };
 
   const previewSlug = slug || slugify(title);
-  const previewPath = `/${previewSlug || "duong-dan"}-${id ?? "id"}.html`;
+  const previewPath = `/${previewSlug || "duong-dan"}-${id ?? "id"}`;
 
   return (
     <Form<FormValues>
@@ -141,8 +141,8 @@ export default function ArticleForm({ id }: { id?: number }) {
             <Form.Item name="title" label="Tiêu đề" rules={[{ required: true, message: "Nhập tiêu đề" }, { max: 250 }]}>
               <Input size="large" showCount maxLength={250} placeholder="Tiêu đề bài viết (nên 40–65 ký tự)" />
             </Form.Item>
-            <Form.Item name="slug" label="Đường dẫn (slug)" tooltip="Tự tạo từ tiêu đề, có thể sửa. URL bài viết: /slug-id.html">
-              <Input addonBefore="/" addonAfter={`-${id ?? "id"}.html`} />
+            <Form.Item name="slug" label="Đường dẫn (slug)" tooltip="Tự tạo từ tiêu đề, có thể sửa. URL bài viết: /slug-id">
+              <Input addonBefore="/" addonAfter={`-${id ?? "id"}`} />
             </Form.Item>
             <Form.Item name="subtitle" label="Tiêu đề phụ (kicker)">
               <Input placeholder="Dòng ngắn hiển thị phía trên tiêu đề" />

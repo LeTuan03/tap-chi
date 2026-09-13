@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { db } from "@/lib/db";
 import { getSiteUrl } from "@/lib/seo";
-import { categoryPath } from "@/lib/utils";
+import { articlePath, categoryPath } from "@/lib/utils";
 
 export const revalidate = 300;
 
@@ -19,7 +19,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   for (const r of refs) {
     entries.push({
-      url: `${base}/${r.slug}-${r.id}.html`,
+      url: `${base}${articlePath(r)}`,
       lastModified: new Date(r.updatedAt),
       changeFrequency: "weekly",
       priority: 0.6,

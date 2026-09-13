@@ -42,7 +42,7 @@ export function excerpt(text: string, max = 160): string {
 }
 
 export function articlePath(a: Pick<Article, "slug" | "id">): string {
-  return `/${a.slug}-${a.id}.html`;
+  return `/${a.slug}-${a.id}`;
 }
 
 export function categoryPath(c: Category, all?: Category[]): string {

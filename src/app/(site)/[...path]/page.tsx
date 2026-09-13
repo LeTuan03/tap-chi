@@ -19,13 +19,13 @@ type Params = { path: string[] };
  *   /{chuyen-muc}                    trang chuyên mục
  *   /{chuyen-muc}/{chuyen-muc-con}   chuyên mục con
  *   /{...}/trang/{n}                 phân trang
- *   /{slug}-{id}.html                bài viết
+ *   /{slug}-{id}                     bài viết (tương thích cả đuôi .html cũ)
  */
 type Route = { kind: "article"; id: number; slug: string } | { kind: "category"; category: Category; page: number };
 
 async function resolve(segments: string[]): Promise<Route | null> {
   if (segments.length === 1) {
-    const m = segments[0].match(/^(.*)-(\d+)\.html$/);
+    const m = segments[0].match(/^(.*)-(\d+)(?:\.html)?$/);
     if (m) return { kind: "article", id: Number(m[2]), slug: m[1] };
   }
   const segs = [...segments];
@@ -48,7 +48,7 @@ export async function generateStaticParams(): Promise<Params[]> {
   const params: Params[] = [];
   for (const c of categories) params.push({ path: c.parent ? [c.parent, c.slug] : [c.slug] });
   // Chỉ dựng sẵn 200 bài mới nhất; các bài còn lại được sinh khi có người truy cập (ISR)
-  for (const r of refs.slice(0, 200)) params.push({ path: [`${r.slug}-${r.id}.html`] });
+  for (const r of refs.slice(0, 200)) params.push({ path: [`${r.slug}-${r.id}`] });
   return params;
 }
 
@@ -77,8 +77,8 @@ export default async function DynamicPage({ params }: { params: Promise<Params> 
   if (route.kind === "article") {
     const a = await getArticleById(route.id);
     if (!a) notFound();
-    // Ép về URL chuẩn nếu slug trong URL không khớp (tránh trùng lặp nội dung)
-    if (a.slug !== route.slug) permanentRedirect(articlePath(a));
+    // Ép về URL chuẩn nếu slug không khớp hoặc truy cập qua URL cũ .html
+    if (path[0] !== `${a.slug}-${a.id}`) permanentRedirect(articlePath(a));
     return <ArticleView article={a} categories={categories} settings={settings} />;
   }
 
