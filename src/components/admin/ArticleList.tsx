@@ -1,28 +1,23 @@
 "use client";
 
 import { DeleteOutlined, EditOutlined, EyeOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons";
-import { App, Button, Card, Input, Popconfirm, Select, Space, Table, Tag, Tooltip, Typography } from "antd";
+import { App, Button, Card, DatePicker, Input, Popconfirm, Select, Space, Table, Tag, Tooltip, Typography } from "antd";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { ArticleService, CategoryService } from "@/lib/services";
-import type { Article, Category } from "@/lib/types";
+import type { Article, Category, PagedResponse } from "@/lib/types";
 import { articlePath, formatDateTime } from "@/lib/utils";
-
-interface ListResponse {
-  items: Article[];
-  total: number;
-  page: number;
-  pageSize: number;
-}
 
 export default function ArticleList() {
   const { message } = App.useApp();
-  const [data, setData] = useState<ListResponse>({ items: [], total: 0, page: 1, pageSize: 20 });
+  const [data, setData] = useState<PagedResponse<Article>>({ items: [], total: 0, page: 1, pageSize: 20, totalPages: 0 });
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
   const [q, setQ] = useState("");
   const [category, setCategory] = useState<string | undefined>();
   const [status, setStatus] = useState<string | undefined>();
+  const [fromDate, setFromDate] = useState<string | undefined>();
+  const [toDate, setToDate] = useState<string | undefined>();
   const [page, setPage] = useState(1);
 
   const load = useCallback(async () => {
@@ -32,20 +27,22 @@ export default function ArticleList() {
       if (q) params.set("q", q);
       if (category) params.set("category", category);
       if (status) params.set("status", status);
+      if (fromDate) params.set("fromDate", fromDate);
+      if (toDate) params.set("toDate", toDate);
       setData(await ArticleService.list(params));
     } catch (e) {
       message.error((e as Error).message);
     } finally {
       setLoading(false);
     }
-  }, [page, q, category, status, message]);
+  }, [page, q, category, status, fromDate, toDate, message]);
 
   useEffect(() => {
     load();
   }, [load]);
 
   useEffect(() => {
-    CategoryService.list()
+    CategoryService.list({ pageSize: "100" })
       .then((r) => setCategories(r.items))
       .catch(() => undefined);
   }, []);
@@ -80,7 +77,7 @@ export default function ArticleList() {
             allowClear
             placeholder="Tìm theo tiêu đề, mô tả, tác giả"
             prefix={<SearchOutlined />}
-            style={{ width: 320 }}
+            style={{ width: 280 }}
             onSearch={(v) => {
               setPage(1);
               setQ(v.trim());
@@ -90,7 +87,7 @@ export default function ArticleList() {
             allowClear
             showSearch
             placeholder="Chuyên mục"
-            style={{ width: 220 }}
+            style={{ width: 180 }}
             optionFilterProp="label"
             options={categories.map((c) => ({ value: c.slug, label: c.parent ? `— ${c.name}` : c.name }))}
             onChange={(v) => {
@@ -101,7 +98,7 @@ export default function ArticleList() {
           <Select
             allowClear
             placeholder="Trạng thái"
-            style={{ width: 150 }}
+            style={{ width: 130 }}
             options={[
               { value: "published", label: "Đã đăng" },
               { value: "draft", label: "Nháp" },
@@ -109,6 +106,20 @@ export default function ArticleList() {
             onChange={(v) => {
               setPage(1);
               setStatus(v);
+            }}
+          />
+          <DatePicker.RangePicker
+            placeholder={["Từ ngày", "Đến ngày"]}
+            style={{ width: 260 }}
+            onChange={(dates) => {
+              setPage(1);
+              if (dates && dates[0] && dates[1]) {
+                setFromDate(dates[0].format("YYYY-MM-DD"));
+                setToDate(dates[1].format("YYYY-MM-DD"));
+              } else {
+                setFromDate(undefined);
+                setToDate(undefined);
+              }
             }}
           />
         </Space>

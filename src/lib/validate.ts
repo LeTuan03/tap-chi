@@ -12,7 +12,7 @@ export function sanitizeHtml(html: string): string {
 
 import { ARTICLE_STATUSES, ARTICLE_TYPES, MENU_PLACEMENTS } from "./constants";
 
-type ArticleInput = Omit<Article, "id" | "createdAt" | "updatedAt">;
+type ArticleInput = Omit<Article, "id" | "createdAt" | "updatedAt" | "deletedAt" | "isDeleted" | "createdBy" | "updatedBy" | "deletedBy" | "version">;
 type Result<T> = { ok: true; value: T } | { ok: false; errors: string[] };
 
 function str(v: unknown, max = 100000): string {
@@ -77,7 +77,9 @@ export async function parseArticleInput(body: unknown, existing?: Article): Prom
   };
 }
 
-export function parseCategoryInput(body: unknown): Result<Category> {
+type CategoryInput = Omit<Category, "id" | "createdAt" | "updatedAt" | "deletedAt" | "isDeleted" | "createdBy" | "updatedBy" | "deletedBy" | "version">;
+
+export function parseCategoryInput(body: unknown): Result<CategoryInput> {
   const b = (body ?? {}) as Record<string, unknown>;
   const errors: string[] = [];
   const name = str(b.name, 120);
@@ -92,3 +94,84 @@ export function parseCategoryInput(body: unknown): Result<Category> {
   if (errors.length) return { ok: false, errors };
   return { ok: true, value: { slug, name, parent, description: str(b.description, 320), menu, order: Number.isFinite(order) ? order : 0 } };
 }
+
+import type { ListQueryDto } from "./types";
+
+export function parseListQueryDto(input: URLSearchParams | Record<string, unknown>): Result<ListQueryDto> {
+  const errors: string[] = [];
+  const getParam = (key: string): string | undefined => {
+    if (input instanceof URLSearchParams) {
+      const v = input.get(key);
+      return v !== null ? v.trim() : undefined;
+    }
+    const val = input[key];
+    return typeof val === "string" ? val.trim() : typeof val === "number" ? String(val) : undefined;
+  };
+
+  const rawPage = getParam("page");
+  const rawPageSize = getParam("pageSize");
+  const page = Math.max(1, Number(rawPage) || 1);
+  const pageSize = Math.min(100, Math.max(1, Number(rawPageSize) || 20));
+
+  const fromDateRaw = getParam("fromDate");
+  const toDateRaw = getParam("toDate");
+  const dateFieldRaw = getParam("dateField");
+
+  const validDateFields = ["createdAt", "updatedAt", "publishedAt", "deletedAt"] as const;
+  const dateField = validDateFields.includes(dateFieldRaw as (typeof validDateFields)[number])
+    ? (dateFieldRaw as (typeof validDateFields)[number])
+    : "createdAt";
+
+  let parsedFromDate: Date | undefined;
+  let parsedToDate: Date | undefined;
+
+  if (fromDateRaw) {
+    const d = new Date(fromDateRaw.includes("T") ? fromDateRaw : `${fromDateRaw}T00:00:00.000Z`);
+    if (Number.isNaN(d.getTime())) {
+      errors.push("Ngày bắt đầu (fromDate) không hợp lệ");
+    } else {
+      parsedFromDate = d;
+    }
+  }
+
+  if (toDateRaw) {
+    const d = new Date(toDateRaw.includes("T") ? toDateRaw : `${toDateRaw}T23:59:59.999Z`);
+    if (Number.isNaN(d.getTime())) {
+      errors.push("Ngày kết thúc (toDate) không hợp lệ");
+    } else {
+      parsedToDate = d;
+    }
+  }
+
+  if (parsedFromDate && parsedToDate && parsedFromDate.getTime() > parsedToDate.getTime()) {
+    errors.push("Ngày bắt đầu không được lớn hơn ngày kết thúc");
+  }
+
+  const search = getParam("q") || getParam("search") || undefined;
+  const includeDeletedRaw = getParam("includeDeleted");
+  const includeDeleted = includeDeletedRaw === "true" || includeDeletedRaw === "1";
+
+  const sortBy = getParam("sortBy") || undefined;
+  const sortOrderRaw = getParam("sortOrder");
+  const sortOrder = sortOrderRaw === "asc" ? "asc" : sortOrderRaw === "desc" ? "desc" : undefined;
+
+  if (errors.length) {
+    return { ok: false, errors };
+  }
+
+  return {
+    ok: true,
+    value: {
+      page,
+      pageSize,
+      fromDate: parsedFromDate ? parsedFromDate.toISOString() : undefined,
+      toDate: parsedToDate ? parsedToDate.toISOString() : undefined,
+      dateField,
+      search,
+      includeDeleted,
+      sortBy,
+      sortOrder,
+    },
+  };
+}
+

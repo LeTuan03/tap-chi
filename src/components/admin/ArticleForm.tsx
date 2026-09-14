@@ -12,7 +12,7 @@ import { articlePath, slugify, stripHtml } from "@/lib/utils";
 import ArticleFormMain from "./ArticleFormMain";
 import ArticleFormSidebar from "./ArticleFormSidebar";
 
-interface FormValues extends Omit<Article, "id" | "createdAt" | "updatedAt" | "publishedAt"> {
+interface FormValues extends Omit<Article, "id" | "createdAt" | "updatedAt" | "deletedAt" | "isDeleted" | "createdBy" | "updatedBy" | "deletedBy" | "version" | "publishedAt"> {
   publishedAt: Dayjs;
 }
 

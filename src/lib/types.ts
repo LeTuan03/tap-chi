@@ -2,8 +2,56 @@ export type ArticleType = "article" | "photo" | "video";
 export type ArticleStatus = "published" | "draft";
 export type MenuPlacement = "main" | "more" | "hidden";
 
-export interface Article {
-  id: number;
+/**
+ * BaseEntity dùng chung cho các entity trong hệ thống.
+ * Chuẩn hóa các trường quản lý dữ liệu và hỗ trợ xóa mềm (soft delete).
+ */
+export interface BaseEntity<TId = number | string> {
+  id: TId;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+  isDeleted: boolean;
+  createdBy?: string | null;
+  updatedBy?: string | null;
+  deletedBy?: string | null;
+  version?: number;
+}
+
+/** DTO cho bộ lọc tìm kiếm theo khoảng thời gian */
+export interface DateFilterDto {
+  fromDate?: string;
+  toDate?: string;
+  dateField?: "createdAt" | "updatedAt" | "publishedAt" | "deletedAt";
+}
+
+/** DTO cho tham số phân trang */
+export interface PaginationDto {
+  page?: number;
+  pageSize?: number;
+}
+
+/** DTO tổng hợp cho truy vấn danh sách */
+export interface ListQueryDto extends DateFilterDto, PaginationDto {
+  search?: string;
+  includeDeleted?: boolean;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
+  [key: string]: unknown;
+}
+
+/** Response chuẩn hóa cho API danh sách có phân trang */
+export interface PagedResponse<T> {
+  items: T[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}
+
+export type Paged<T> = PagedResponse<T>;
+
+export interface Article extends BaseEntity<number> {
   slug: string;
   title: string;
   /** Tiêu đề phụ / kicker hiển thị phía trên tiêu đề chính */
@@ -31,11 +79,10 @@ export interface Article {
   isSpotlight: boolean;
   views: number;
   publishedAt: string;
-  updatedAt: string;
-  createdAt: string;
 }
 
-export interface Category {
+export interface Category extends BaseEntity<string> {
+  /** Slug trùng với id của Category */
   slug: string;
   name: string;
   parent: string | null;
@@ -44,8 +91,7 @@ export interface Category {
   order: number;
 }
 
-export interface Epaper {
-  id: number;
+export interface Epaper extends BaseEntity<number> {
   title: string;
   slug: string;
   cover: string;
@@ -121,10 +167,3 @@ export interface HomeData {
   ticker: Article[];
 }
 
-export interface Paged<T> {
-  items: T[];
-  page: number;
-  pageSize: number;
-  total: number;
-  totalPages: number;
-}

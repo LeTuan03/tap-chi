@@ -6,7 +6,7 @@
  */
 import type { Article as PrismaArticle, Category as PrismaCategory, Epaper as PrismaEpaper } from "@prisma/client";
 import { prisma } from "./prisma";
-import type { Article, ArticleStatus, ArticleType, Category, Epaper, MenuPlacement, SiteSettings } from "./types";
+import type { Article, ArticleStatus, ArticleType, Category, Epaper, ListQueryDto, MenuPlacement, PagedResponse, SiteSettings } from "./types";
 
 /* ---------- chuyển đổi Prisma <-> kiểu ứng dụng ---------- */
 
@@ -42,6 +42,12 @@ export function toArticle(a: PrismaArticle): Article {
     publishedAt: a.publishedAt.toISOString(),
     updatedAt: a.updatedAt.toISOString(),
     createdAt: a.createdAt.toISOString(),
+    deletedAt: a.deletedAt ? a.deletedAt.toISOString() : null,
+    isDeleted: a.isDeleted,
+    createdBy: a.createdBy ?? null,
+    updatedBy: a.updatedBy ?? null,
+    deletedBy: a.deletedBy ?? null,
+    version: a.version,
   };
 }
 
@@ -51,24 +57,55 @@ export function toArticleSummary(a: Omit<PrismaArticle, "content">): Article {
 }
 
 function toCategory(c: PrismaCategory): Category {
-  return { slug: c.slug, name: c.name, parent: c.parentSlug, description: c.description, menu: c.menu as MenuPlacement, order: c.order };
+  return {
+    id: c.slug,
+    slug: c.slug,
+    name: c.name,
+    parent: c.parentSlug,
+    description: c.description,
+    menu: c.menu as MenuPlacement,
+    order: c.order,
+    createdAt: c.createdAt.toISOString(),
+    updatedAt: c.updatedAt.toISOString(),
+    deletedAt: c.deletedAt ? c.deletedAt.toISOString() : null,
+    isDeleted: c.isDeleted,
+    createdBy: c.createdBy ?? null,
+    updatedBy: c.updatedBy ?? null,
+    deletedBy: c.deletedBy ?? null,
+    version: c.version,
+  };
 }
 
 function toEpaper(e: PrismaEpaper): Epaper {
-  return { id: e.id, title: e.title, slug: e.slug, cover: e.cover, link: e.link, publishedAt: e.publishedAt.toISOString() };
+  return {
+    id: e.id,
+    title: e.title,
+    slug: e.slug,
+    cover: e.cover,
+    link: e.link,
+    publishedAt: e.publishedAt.toISOString(),
+    createdAt: e.createdAt.toISOString(),
+    updatedAt: e.updatedAt.toISOString(),
+    deletedAt: e.deletedAt ? e.deletedAt.toISOString() : null,
+    isDeleted: e.isDeleted,
+    createdBy: e.createdBy ?? null,
+    updatedBy: e.updatedBy ?? null,
+    deletedBy: e.deletedBy ?? null,
+    version: e.version,
+  };
 }
 
-function toPrismaArticle(a: Article) {
+function toPrismaArticle(a: Partial<Article>) {
   return {
-    slug: a.slug,
-    title: a.title,
+    slug: a.slug!,
+    title: a.title!,
     subtitle: a.subtitle ?? "",
     sapo: a.sapo ?? "",
     description: a.description ?? "",
     content: a.content ?? "",
     image: a.image ?? "",
     ogImage: a.ogImage ?? "",
-    categorySlug: a.category,
+    categorySlug: a.category!,
     tags: JSON.stringify(a.tags ?? []),
     author: a.author ?? "",
     source: a.source ?? "",
@@ -77,18 +114,43 @@ function toPrismaArticle(a: Article) {
     isFeatured: !!a.isFeatured,
     isSpotlight: !!a.isSpotlight,
     views: a.views ?? 0,
-    publishedAt: new Date(a.publishedAt),
+    publishedAt: new Date(a.publishedAt!),
+    createdBy: a.createdBy ?? null,
+    updatedBy: a.updatedBy ?? null,
   };
 }
 
 /** Các cột dùng cho danh sách (không lấy content để nhẹ) */
 const summarySelect = {
-  id: true, slug: true, title: true, subtitle: true, sapo: true, description: true, image: true, ogImage: true,
-  categorySlug: true, tags: true, author: true, source: true, type: true, status: true, isFeatured: true,
-  isSpotlight: true, views: true, publishedAt: true, updatedAt: true, createdAt: true,
+  id: true,
+  slug: true,
+  title: true,
+  subtitle: true,
+  sapo: true,
+  description: true,
+  image: true,
+  ogImage: true,
+  categorySlug: true,
+  tags: true,
+  author: true,
+  source: true,
+  type: true,
+  status: true,
+  isFeatured: true,
+  isSpotlight: true,
+  views: true,
+  publishedAt: true,
+  updatedAt: true,
+  createdAt: true,
+  deletedAt: true,
+  isDeleted: true,
+  createdBy: true,
+  updatedBy: true,
+  deletedBy: true,
+  version: true,
 } as const;
 
-export interface ArticleListQuery {
+export interface ArticleListQuery extends ListQueryDto {
   status?: ArticleStatus;
   /** danh sách slug chuyên mục (bao gồm chuyên mục con) */
   categories?: string[];
@@ -97,14 +159,14 @@ export interface ArticleListQuery {
   types?: ArticleType[];
   excludeIds?: number[];
   publishedBefore?: Date;
-  search?: string;
-  orderBy?: "publishedAt" | "views" | "updatedAt";
+  orderBy?: "publishedAt" | "views" | "updatedAt" | "createdAt";
   skip?: number;
   take?: number;
 }
 
 function buildWhere(q: ArticleListQuery) {
-  return {
+  const where: Record<string, unknown> = {
+    isDeleted: q.includeDeleted ? undefined : false,
     ...(q.status ? { status: q.status } : {}),
     ...(q.categories ? { categorySlug: { in: q.categories } } : {}),
     ...(typeof q.featured === "boolean" ? { isFeatured: q.featured } : {}),
@@ -112,51 +174,98 @@ function buildWhere(q: ArticleListQuery) {
     ...(q.types ? { type: { in: q.types } } : {}),
     ...(q.excludeIds?.length ? { id: { notIn: q.excludeIds } } : {}),
     ...(q.publishedBefore ? { publishedAt: { lte: q.publishedBefore } } : {}),
-    ...(q.search
-      ? {
-          OR: [
-            { title: { contains: q.search, mode: "insensitive" as const } },
-            { description: { contains: q.search, mode: "insensitive" as const } },
-            { author: { contains: q.search, mode: "insensitive" as const } },
-          ],
-        }
-      : {}),
   };
+
+  const search = q.search || q.q;
+  if (typeof search === "string" && search.trim()) {
+    const s = search.trim();
+    where.OR = [
+      { title: { contains: s, mode: "insensitive" } },
+      { description: { contains: s, mode: "insensitive" } },
+      { author: { contains: s, mode: "insensitive" } },
+    ];
+  }
+
+  const dateField = q.dateField || "createdAt";
+  const dateWhere: Record<string, Date> = {};
+  if (q.fromDate) dateWhere.gte = new Date(q.fromDate);
+  if (q.toDate) dateWhere.lte = new Date(q.toDate);
+  if (Object.keys(dateWhere).length > 0) {
+    where[dateField] = dateWhere;
+  }
+
+  return where;
 }
 
 export const db = {
   articles: {
     /** Danh sách bài viết (không kèm content) */
     async list(q: ArticleListQuery = {}): Promise<Article[]> {
+      const orderByObj =
+        q.orderBy === "views"
+          ? [{ views: "desc" as const }, { publishedAt: "desc" as const }, { id: "desc" as const }]
+          : q.orderBy === "updatedAt"
+          ? [{ updatedAt: "desc" as const }, { id: "desc" as const }]
+          : q.orderBy === "createdAt"
+          ? [{ createdAt: "desc" as const }, { id: "desc" as const }]
+          : [{ publishedAt: "desc" as const }, { id: "desc" as const }];
+
       const rows = await prisma.article.findMany({
         where: buildWhere(q),
-        orderBy: q.orderBy === "views" ? [{ views: "desc" }, { publishedAt: "desc" }] : q.orderBy === "updatedAt" ? { updatedAt: "desc" } : { publishedAt: "desc" },
+        orderBy: orderByObj,
         skip: q.skip,
         take: q.take,
         select: summarySelect,
       });
       return rows.map(toArticleSummary);
     },
+    async pagedList(q: ArticleListQuery = {}): Promise<PagedResponse<Article>> {
+      const page = Math.max(1, q.page || 1);
+      const pageSize = Math.min(100, Math.max(1, q.pageSize || 20));
+      const skip = (page - 1) * pageSize;
+
+      const [items, total] = await Promise.all([
+        this.list({ ...q, skip, take: pageSize }),
+        this.count(q),
+      ]);
+      const totalPages = Math.ceil(total / pageSize);
+      return { items, total, page, pageSize, totalPages };
+    },
     async count(q: ArticleListQuery = {}): Promise<number> {
       return prisma.article.count({ where: buildWhere(q) });
     },
-    async get(id: number): Promise<Article | undefined> {
-      const row = await prisma.article.findUnique({ where: { id } });
+    async get(id: number, includeDeleted = false): Promise<Article | undefined> {
+      const row = await prisma.article.findFirst({
+        where: { id, ...(includeDeleted ? {} : { isDeleted: false }) },
+      });
       return row ? toArticle(row) : undefined;
     },
-    async create(a: Omit<Article, "id" | "createdAt" | "updatedAt">): Promise<Article> {
+    async create(a: Omit<Article, "id" | "createdAt" | "updatedAt" | "deletedAt" | "isDeleted">): Promise<Article> {
       const row = await prisma.article.create({ data: toPrismaArticle(a as Article) });
       return toArticle(row);
     },
-    async update(id: number, a: Partial<Article>): Promise<Article> {
-      const current = await prisma.article.findUniqueOrThrow({ where: { id } });
-      const merged = { ...toArticle(current), ...a, id };
-      const row = await prisma.article.update({ where: { id }, data: toPrismaArticle(merged) });
+    async update(id: number, a: Partial<Article>, updatedBy?: string): Promise<Article> {
+      const current = await prisma.article.findFirstOrThrow({ where: { id } });
+      const merged = { ...toArticle(current), ...a, id, updatedBy: updatedBy ?? a.updatedBy ?? null };
+      const row = await prisma.article.update({
+        where: { id },
+        data: {
+          ...toPrismaArticle(merged),
+          version: { increment: 1 },
+        },
+      });
       return toArticle(row);
     },
-    async remove(id: number): Promise<boolean> {
+    async remove(id: number, deletedBy?: string): Promise<boolean> {
       try {
-        await prisma.article.delete({ where: { id } });
+        await prisma.article.update({
+          where: { id },
+          data: {
+            isDeleted: true,
+            deletedAt: new Date(),
+            deletedBy: deletedBy ?? null,
+          },
+        });
         return true;
       } catch {
         return false;
@@ -164,12 +273,12 @@ export const db = {
     },
     async incrementViews(id: number): Promise<void> {
       // Dùng SQL thuần để không kích hoạt @updatedAt (lượt xem không phải là "sửa bài")
-      await prisma.$executeRaw`UPDATE "Article" SET "views" = "views" + 1 WHERE "id" = ${id}`.catch(() => undefined);
+      await prisma.$executeRaw`UPDATE "Article" SET "views" = "views" + 1 WHERE "id" = ${id} AND "isDeleted" = false`.catch(() => undefined);
     },
     /** id + slug + updatedAt của toàn bộ bài đã đăng (cho sitemap / static params) */
     async publishedRefs(): Promise<{ id: number; slug: string; updatedAt: string; image: string; title: string; publishedAt: string }[]> {
       const rows = await prisma.article.findMany({
-        where: { status: "published", publishedAt: { lte: new Date() } },
+        where: { status: "published", publishedAt: { lte: new Date() }, isDeleted: false },
         select: { id: true, slug: true, updatedAt: true, image: true, title: true, publishedAt: true },
         orderBy: { publishedAt: "desc" },
       });
@@ -177,29 +286,105 @@ export const db = {
     },
   },
   categories: {
-    async all(): Promise<Category[]> {
-      const rows = await prisma.category.findMany({ orderBy: { order: "asc" } });
+    async all(includeDeleted = false): Promise<Category[]> {
+      const rows = await prisma.category.findMany({
+        where: includeDeleted ? {} : { isDeleted: false },
+        orderBy: { order: "asc" },
+      });
       return rows.map(toCategory);
     },
-    async get(slug: string): Promise<Category | undefined> {
-      const row = await prisma.category.findUnique({ where: { slug } });
+    async pagedList(q: ListQueryDto = {}): Promise<PagedResponse<Category>> {
+      const page = Math.max(1, q.page || 1);
+      const pageSize = Math.min(100, Math.max(1, q.pageSize || 20));
+      const skip = (page - 1) * pageSize;
+
+      const where: Record<string, unknown> = {
+        isDeleted: q.includeDeleted ? undefined : false,
+      };
+
+      const search = q.search || q.q;
+      if (typeof search === "string" && search.trim()) {
+        const s = search.trim();
+        where.OR = [
+          { name: { contains: s, mode: "insensitive" } },
+          { slug: { contains: s, mode: "insensitive" } },
+          { description: { contains: s, mode: "insensitive" } },
+        ];
+      }
+
+      const dateField = q.dateField || "createdAt";
+      const dateWhere: Record<string, Date> = {};
+      if (q.fromDate) dateWhere.gte = new Date(q.fromDate);
+      if (q.toDate) dateWhere.lte = new Date(q.toDate);
+      if (Object.keys(dateWhere).length > 0) {
+        where[dateField] = dateWhere;
+      }
+
+      const [rows, total] = await Promise.all([
+        prisma.category.findMany({
+          where,
+          orderBy: [{ order: "asc" }, { createdAt: "desc" }, { slug: "asc" }],
+          skip,
+          take: pageSize,
+        }),
+        prisma.category.count({ where }),
+      ]);
+
+      const items = rows.map(toCategory);
+      const totalPages = Math.ceil(total / pageSize);
+      return { items, total, page, pageSize, totalPages };
+    },
+    async get(slug: string, includeDeleted = false): Promise<Category | undefined> {
+      const row = await prisma.category.findFirst({
+        where: { slug, ...(includeDeleted ? {} : { isDeleted: false }) },
+      });
       return row ? toCategory(row) : undefined;
     },
-    async upsert(c: Category): Promise<Category> {
-      const data = { name: c.name, parentSlug: c.parent || null, description: c.description ?? "", menu: c.menu ?? "main", order: c.order ?? 0 };
-      const row = await prisma.category.upsert({ where: { slug: c.slug }, create: { slug: c.slug, ...data }, update: data });
+    async upsert(c: Partial<Category> & { slug: string; name: string }): Promise<Category> {
+      const data = {
+        name: c.name,
+        parentSlug: c.parent || null,
+        description: c.description ?? "",
+        menu: c.menu ?? "main",
+        order: c.order ?? 0,
+        createdBy: c.createdBy ?? null,
+        updatedBy: c.updatedBy ?? null,
+        isDeleted: false,
+        deletedAt: null,
+      };
+      const row = await prisma.category.upsert({
+        where: { slug: c.slug },
+        create: { slug: c.slug, ...data },
+        update: { ...data, version: { increment: 1 } },
+      });
       return toCategory(row);
     },
-    async remove(slug: string): Promise<{ ok: boolean; reason?: string }> {
-      const used = await prisma.article.count({ where: { categorySlug: slug } });
+    async remove(slug: string, deletedBy?: string): Promise<{ ok: boolean; reason?: string }> {
+      const used = await prisma.article.count({ where: { categorySlug: slug, isDeleted: false } });
       if (used > 0) return { ok: false, reason: `Chuyên mục đang có ${used} bài viết` };
-      const children = await prisma.category.count({ where: { parentSlug: slug } });
+      const children = await prisma.category.count({ where: { parentSlug: slug, isDeleted: false } });
       if (children > 0) return { ok: false, reason: "Chuyên mục đang có chuyên mục con" };
-      await prisma.category.delete({ where: { slug } });
-      return { ok: true };
+
+      try {
+        await prisma.category.update({
+          where: { slug },
+          data: {
+            isDeleted: true,
+            deletedAt: new Date(),
+            deletedBy: deletedBy ?? null,
+          },
+        });
+        return { ok: true };
+      } catch {
+        return { ok: false, reason: "Lỗi hệ thống khi xóa chuyên mục" };
+      }
     },
     async countArticles(): Promise<Record<string, number>> {
-      const rows = await prisma.article.groupBy({ by: ["categorySlug"], _count: { _all: true } });
+      const rows = await prisma.article.groupBy({
+        where: { isDeleted: false },
+        by: ["categorySlug"],
+        _count: { _all: true },
+      });
       return Object.fromEntries(rows.map((r) => [r.categorySlug, r._count._all]));
     },
   },
@@ -215,22 +400,57 @@ export const db = {
     },
   },
   epapers: {
-    async all(): Promise<Epaper[]> {
-      const rows = await prisma.epaper.findMany({ orderBy: { publishedAt: "desc" } });
+    async all(includeDeleted = false): Promise<Epaper[]> {
+      const rows = await prisma.epaper.findMany({
+        where: includeDeleted ? {} : { isDeleted: false },
+        orderBy: { publishedAt: "desc" },
+      });
       return rows.map(toEpaper);
+    },
+    async pagedList(q: ListQueryDto = {}): Promise<PagedResponse<Epaper>> {
+      const page = Math.max(1, q.page || 1);
+      const pageSize = Math.min(100, Math.max(1, q.pageSize || 20));
+      const skip = (page - 1) * pageSize;
+
+      const where: Record<string, unknown> = {
+        isDeleted: q.includeDeleted ? undefined : false,
+      };
+
+      const dateField = q.dateField || "createdAt";
+      const dateWhere: Record<string, Date> = {};
+      if (q.fromDate) dateWhere.gte = new Date(q.fromDate);
+      if (q.toDate) dateWhere.lte = new Date(q.toDate);
+      if (Object.keys(dateWhere).length > 0) {
+        where[dateField] = dateWhere;
+      }
+
+      const [rows, total] = await Promise.all([
+        prisma.epaper.findMany({
+          where,
+          orderBy: [{ publishedAt: "desc" }, { id: "desc" }],
+          skip,
+          take: pageSize,
+        }),
+        prisma.epaper.count({ where }),
+      ]);
+
+      const items = rows.map(toEpaper);
+      const totalPages = Math.ceil(total / pageSize);
+      return { items, total, page, pageSize, totalPages };
     },
   },
   stats: {
     async dashboard() {
       const [articles, published, drafts, categories, latest] = await Promise.all([
-        prisma.article.count(),
-        prisma.article.count({ where: { status: "published" } }),
-        prisma.article.count({ where: { status: "draft" } }),
-        prisma.category.count(),
-        prisma.article.findMany({ orderBy: { updatedAt: "desc" }, take: 8, select: summarySelect }),
+        prisma.article.count({ where: { isDeleted: false } }),
+        prisma.article.count({ where: { status: "published", isDeleted: false } }),
+        prisma.article.count({ where: { status: "draft", isDeleted: false } }),
+        prisma.category.count({ where: { isDeleted: false } }),
+        prisma.article.findMany({ where: { isDeleted: false }, orderBy: { updatedAt: "desc" }, take: 8, select: summarySelect }),
       ]);
-      const totalViews = await prisma.article.aggregate({ _sum: { views: true } });
+      const totalViews = await prisma.article.aggregate({ where: { isDeleted: false }, _sum: { views: true } });
       return { articles, published, drafts, categories, totalViews: totalViews._sum.views ?? 0, latest: latest.map(toArticleSummary) };
     },
   },
 };
+

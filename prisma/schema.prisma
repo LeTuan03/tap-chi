@@ -22,47 +22,79 @@ model Category {
   menu        String     @default("main")
   order       Int        @default(0)
   articles    Article[]
+
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @default(now()) @updatedAt
+  deletedAt   DateTime?
+  isDeleted   Boolean    @default(false)
+  createdBy   String?
+  updatedBy   String?
+  deletedBy   String?
+  version     Int        @default(1)
+
+  @@index([isDeleted, createdAt])
 }
 
 model Article {
-  id           Int      @id @default(autoincrement())
+  id           Int       @id @default(autoincrement())
   slug         String
   title        String
-  subtitle     String   @default("")
-  sapo         String   @default("")
-  description  String   @default("")
-  content      String   @default("")
-  image        String   @default("")
-  ogImage      String   @default("")
+  subtitle     String    @default("")
+  sapo         String    @default("")
+  description  String    @default("")
+  content      String    @default("")
+  image        String    @default("")
+  ogImage      String    @default("")
   categorySlug String
-  category     Category @relation(fields: [categorySlug], references: [slug])
+  category     Category  @relation(fields: [categorySlug], references: [slug])
   /// Mảng JSON các từ khóa, ví dụ ["làng nghề","OCOP"]
-  tags         String   @default("[]")
-  author       String   @default("")
-  source       String   @default("")
+  tags         String    @default("[]")
+  author       String    @default("")
+  source       String    @default("")
   /// article | photo | video
-  type         String   @default("article")
+  type         String    @default("article")
   /// published | draft
-  status       String   @default("published")
-  isFeatured   Boolean  @default(false)
-  isSpotlight  Boolean  @default(false)
-  views        Int      @default(0)
+  status       String    @default("published")
+  isFeatured   Boolean   @default(false)
+  isSpotlight  Boolean   @default(false)
+  views        Int       @default(0)
   publishedAt  DateTime
-  updatedAt    DateTime @updatedAt
-  createdAt    DateTime @default(now())
+  updatedAt    DateTime  @updatedAt
+  createdAt    DateTime  @default(now())
+
+  deletedAt    DateTime?
+  isDeleted    Boolean   @default(false)
+  createdBy    String?
+  updatedBy    String?
+  deletedBy    String?
+  version      Int       @default(1)
 
   @@index([status, publishedAt])
   @@index([categorySlug, status, publishedAt])
   @@index([slug])
+  @@index([isDeleted, createdAt])
+  @@index([isDeleted, updatedAt])
+  @@index([isDeleted, status, publishedAt])
 }
 
 model Epaper {
-  id          Int      @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   title       String
   slug        String
   cover       String
   link        String
   publishedAt DateTime
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now()) @updatedAt
+  deletedAt   DateTime?
+  isDeleted   Boolean   @default(false)
+  createdBy   String?
+  updatedBy   String?
+  deletedBy   String?
+  version     Int       @default(1)
+
+  @@index([isDeleted, createdAt])
 }
 
 /// Cấu hình site lưu dạng JSON theo khóa (khóa "site" chứa SiteSettings)
@@ -70,3 +102,4 @@ model Setting {
   key   String @id
   value String
 }
+

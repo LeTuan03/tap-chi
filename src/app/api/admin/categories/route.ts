@@ -1,11 +1,22 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { revalidateSite } from "@/lib/revalidate";
-import { parseCategoryInput } from "@/lib/validate";
+import { parseCategoryInput, parseListQueryDto } from "@/lib/validate";
 
-export async function GET() {
-  const [items, counts] = await Promise.all([db.categories.all(), db.categories.countArticles()]);
-  return NextResponse.json({ items: items.map((c) => ({ ...c, articleCount: counts[c.slug] ?? 0 })) });
+export async function GET(req: Request) {
+  const url = new URL(req.url);
+  const parsedQuery = parseListQueryDto(url.searchParams);
+  if (!parsedQuery.ok) {
+    return NextResponse.json({ errors: parsedQuery.errors }, { status: 400 });
+  }
+
+  const [paged, counts] = await Promise.all([
+    db.categories.pagedList(parsedQuery.value),
+    db.categories.countArticles(),
+  ]);
+
+  const items = paged.items.map((c) => ({ ...c, articleCount: counts[c.slug] ?? 0 }));
+  return NextResponse.json({ ...paged, items });
 }
 
 /** Tạo mới hoặc cập nhật (theo slug) */

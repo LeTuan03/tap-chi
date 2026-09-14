@@ -1,15 +1,18 @@
 import { api } from "./admin-client";
-import type { Article, Category, SiteSettings } from "./types";
+import type { Article, Category, PagedResponse, SiteSettings } from "./types";
 
-interface ListResponse<T> {
-  items: T[];
-  total: number;
-  page: number;
-  pageSize: number;
+function toQueryString(params?: URLSearchParams | string | Record<string, string>): string {
+  if (!params) return "";
+  if (typeof params === "string") return params;
+  if (params instanceof URLSearchParams) return params.toString();
+  return new URLSearchParams(params).toString();
 }
 
 export const ArticleService = {
-  list: (params: URLSearchParams) => api<ListResponse<Article>>(`/api/admin/articles?${params}`),
+  list: (params?: URLSearchParams | string | Record<string, string>) => {
+    const q = toQueryString(params);
+    return api<PagedResponse<Article>>(`/api/admin/articles${q ? `?${q}` : ""}`);
+  },
   get: (id: number) => api<Article>(`/api/admin/articles/${id}`),
   create: (payload: Record<string, unknown>) => api<Article>("/api/admin/articles", { method: "POST", json: payload }),
   update: (id: number, payload: Record<string, unknown>) => api<Article>(`/api/admin/articles/${id}`, { method: "PUT", json: payload }),
@@ -17,10 +20,14 @@ export const ArticleService = {
 };
 
 export const CategoryService = {
-  list: () => api<{ items: Category[] }>("/api/admin/categories"),
+  list: (params?: URLSearchParams | string | Record<string, string>) => {
+    const q = toQueryString(params);
+    return api<PagedResponse<Category & { articleCount?: number }>>(`/api/admin/categories${q ? `?${q}` : ""}`);
+  },
   upsert: (values: Category) => api("/api/admin/categories", { method: "PUT", json: { ...values, parent: values.parent || null } }),
   remove: (slug: string) => api(`/api/admin/categories?slug=${encodeURIComponent(slug)}`, { method: "DELETE" }),
 };
+
 
 export const SettingsService = {
   get: () => api<SiteSettings>("/api/admin/settings"),
