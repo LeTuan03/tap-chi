@@ -4,7 +4,7 @@ import { LockOutlined } from "@ant-design/icons";
 import { App, Button, Card, Form, Input, Typography } from "antd";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
-import { api } from "@/lib/admin-client";
+import { AuthService } from "@/lib/services";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -15,7 +15,7 @@ export default function LoginForm() {
   const onFinish = async ({ password }: { password: string }) => {
     setLoading(true);
     try {
-      await api("/api/admin/auth", { method: "POST", json: { password } });
+      await AuthService.login(password);
       const next = params.get("next");
       router.replace(next && next.startsWith("/admin") ? next : "/admin");
     } catch (e) {

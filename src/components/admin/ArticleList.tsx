@@ -4,7 +4,7 @@ import { DeleteOutlined, EditOutlined, EyeOutlined, PlusOutlined, SearchOutlined
 import { App, Button, Card, Input, Popconfirm, Select, Space, Table, Tag, Tooltip, Typography } from "antd";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { api } from "@/lib/admin-client";
+import { ArticleService, CategoryService } from "@/lib/services";
 import type { Article, Category } from "@/lib/types";
 import { articlePath, formatDateTime } from "@/lib/utils";
 
@@ -32,7 +32,7 @@ export default function ArticleList() {
       if (q) params.set("q", q);
       if (category) params.set("category", category);
       if (status) params.set("status", status);
-      setData(await api<ListResponse>(`/api/admin/articles?${params}`));
+      setData(await ArticleService.list(params));
     } catch (e) {
       message.error((e as Error).message);
     } finally {
@@ -45,14 +45,14 @@ export default function ArticleList() {
   }, [load]);
 
   useEffect(() => {
-    api<{ items: Category[] }>("/api/admin/categories")
+    CategoryService.list()
       .then((r) => setCategories(r.items))
       .catch(() => undefined);
   }, []);
 
   const remove = async (id: number) => {
     try {
-      await api(`/api/admin/articles/${id}`, { method: "DELETE" });
+      await ArticleService.remove(id);
       message.success("Đã xóa bài viết");
       load();
     } catch (e) {

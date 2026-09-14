@@ -6,12 +6,11 @@ import dayjs, { type Dayjs } from "dayjs";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { api } from "@/lib/admin-client";
+import { ArticleService, CategoryService, SettingsService } from "@/lib/services";
 import type { Article, Category, SiteSettings } from "@/lib/types";
 import { articlePath, slugify, stripHtml } from "@/lib/utils";
-import ImageField from "./ImageField";
-import RichEditor from "./RichEditor";
-import SeoPreview from "./SeoPreview";
+import ArticleFormMain from "./ArticleFormMain";
+import ArticleFormSidebar from "./ArticleFormSidebar";
 
 interface FormValues extends Omit<Article, "id" | "createdAt" | "updatedAt" | "publishedAt"> {
   publishedAt: Dayjs;
@@ -54,7 +53,7 @@ export default function ArticleForm({ id }: { id?: number }) {
   const sapo = Form.useWatch("sapo", form) ?? "";
 
   useEffect(() => {
-    Promise.all([api<{ items: Category[] }>("/api/admin/categories"), api<SiteSettings>("/api/admin/settings")])
+    Promise.all([CategoryService.list(), SettingsService.get()])
       .then(([c, s]) => {
         setCategories(c.items);
         setSettings(s);
@@ -64,7 +63,7 @@ export default function ArticleForm({ id }: { id?: number }) {
 
   useEffect(() => {
     if (!id) return;
-    api<Article>(`/api/admin/articles/${id}`)
+    ArticleService.get(id)
       .then((a) => {
         setArticle(a);
         form.setFieldsValue({ ...a, publishedAt: dayjs(a.publishedAt) });
@@ -83,11 +82,11 @@ export default function ArticleForm({ id }: { id?: number }) {
     try {
       const payload = { ...values, publishedAt: values.publishedAt.toISOString() };
       if (id) {
-        await api(`/api/admin/articles/${id}`, { method: "PUT", json: payload });
+        await ArticleService.update(id, payload);
         message.success("Đã lưu bài viết");
         router.refresh();
       } else {
-        const created = await api<Article>("/api/admin/articles", { method: "POST", json: payload });
+        const created = await ArticleService.create(payload);
         message.success("Đã tạo bài viết");
         router.replace(`/admin/bai-viet/${created.id}`);
       }
@@ -137,96 +136,18 @@ export default function ArticleForm({ id }: { id?: number }) {
 
       <Row gutter={[16, 16]}>
         <Col xs={24} lg={16}>
-          <Card loading={loading}>
-            <Form.Item name="title" label="Tiêu đề" rules={[{ required: true, message: "Nhập tiêu đề" }, { max: 250 }]}>
-              <Input size="large" showCount maxLength={250} placeholder="Tiêu đề bài viết (nên 40–65 ký tự)" />
-            </Form.Item>
-            <Form.Item name="slug" label="Đường dẫn (slug)" tooltip="Tự tạo từ tiêu đề, có thể sửa. URL bài viết: /slug-id">
-              <Input addonBefore="/" addonAfter={`-${id ?? "id"}`} />
-            </Form.Item>
-            <Form.Item name="subtitle" label="Tiêu đề phụ (kicker)">
-              <Input placeholder="Dòng ngắn hiển thị phía trên tiêu đề" />
-            </Form.Item>
-            <Form.Item name="sapo" label="Sa-pô (đoạn mở đầu)" rules={[{ max: 2000 }]}>
-              <Input.TextArea rows={3} showCount maxLength={2000} placeholder="LNV - Tóm tắt ngắn gọn nội dung bài viết" />
-            </Form.Item>
-            <Form.Item name="content" label="Nội dung" valuePropName="value" trigger="onChange">
-              <RichEditor />
-            </Form.Item>
-          </Card>
+          <ArticleFormMain id={id} loading={loading} />
         </Col>
         <Col xs={24} lg={8}>
-          <Space direction="vertical" size={16} style={{ width: "100%" }}>
-            <Card title="Xuất bản" size="small" loading={loading}>
-              <Form.Item name="status" label="Trạng thái">
-                <Select
-                  options={[
-                    { value: "published", label: "Đã đăng" },
-                    { value: "draft", label: "Bản nháp" },
-                  ]}
-                />
-              </Form.Item>
-              <Form.Item name="publishedAt" label="Thời gian đăng" rules={[{ required: true }]}>
-                <DatePicker showTime format="DD/MM/YYYY HH:mm" style={{ width: "100%" }} />
-              </Form.Item>
-              <Form.Item name="category" label="Chuyên mục" rules={[{ required: true, message: "Chọn chuyên mục" }]}>
-                <Select showSearch optionFilterProp="label" options={categoryOptions} placeholder="Chọn chuyên mục" />
-              </Form.Item>
-              <Form.Item name="type" label="Loại bài">
-                <Select
-                  options={[
-                    { value: "article", label: "Bài viết" },
-                    { value: "photo", label: "Phóng sự ảnh" },
-                    { value: "video", label: "Video" },
-                  ]}
-                />
-              </Form.Item>
-              <Row gutter={8}>
-                <Col span={12}>
-                  <Form.Item name="isFeatured" label="Tiêu điểm (slider)" valuePropName="checked">
-                    <Switch />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item name="isSpotlight" label="Dải Nổi bật" valuePropName="checked">
-                    <Switch />
-                  </Form.Item>
-                </Col>
-              </Row>
-              <Form.Item name="author" label="Tác giả">
-                <Input placeholder="Tên tác giả" />
-              </Form.Item>
-              <Form.Item name="source" label="Nguồn">
-                <Input placeholder="Theo ..." />
-              </Form.Item>
-              <Form.Item name="views" label="Lượt xem" tooltip="Dùng để xếp hạng mục Đọc nhiều">
-                <Input type="number" min={0} />
-              </Form.Item>
-            </Card>
-            <Card title="Ảnh đại diện" size="small" loading={loading}>
-              <Form.Item name="image" noStyle>
-                <ImageField />
-              </Form.Item>
-              <Form.Item name="ogImage" label="Ảnh chia sẻ mạng xã hội (1200×630)" tooltip="Bỏ trống sẽ dùng ảnh đại diện" style={{ marginTop: 12, marginBottom: 0 }}>
-                <Input placeholder="URL ảnh 1200×630" />
-              </Form.Item>
-            </Card>
-            <Card title="SEO" size="small" loading={loading}>
-              <Form.Item name="description" label="Mô tả (meta description)" rules={[{ max: 320 }]} extra="Nên 120–160 ký tự, chứa từ khóa chính.">
-                <Input.TextArea rows={3} showCount maxLength={320} />
-              </Form.Item>
-              <Form.Item name="tags" label="Từ khóa (tags)">
-                <Select mode="tags" tokenSeparators={[","]} placeholder="Nhập từ khóa, Enter để thêm" />
-              </Form.Item>
-              <SeoPreview
-                siteName={settings?.siteName ?? "Tạp chí Làng nghề Việt Nam"}
-                siteUrl={typeof window !== "undefined" ? window.location.origin : ""}
-                path={previewPath}
-                title={title}
-                description={description || stripHtml(sapo).slice(0, 160)}
-              />
-            </Card>
-          </Space>
+          <ArticleFormSidebar
+            loading={loading}
+            categoryOptions={categoryOptions}
+            title={title}
+            description={description}
+            sapo={sapo}
+            previewPath={previewPath}
+            settings={settings}
+          />
         </Col>
       </Row>
     </Form>

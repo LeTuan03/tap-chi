@@ -3,7 +3,7 @@
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { App, Button, Card, Form, Input, InputNumber, Modal, Popconfirm, Select, Space, Table, Tag, Typography } from "antd";
 import { useCallback, useEffect, useState } from "react";
-import { api } from "@/lib/admin-client";
+import { CategoryService } from "@/lib/services";
 import type { Category } from "@/lib/types";
 import { slugify } from "@/lib/utils";
 
@@ -21,7 +21,7 @@ export default function CategoryManager() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      setRows((await api<{ items: Row[] }>("/api/admin/categories")).items);
+      setRows((await CategoryService.list()).items as Row[]);
     } catch (e) {
       message.error((e as Error).message);
     } finally {
@@ -41,7 +41,7 @@ export default function CategoryManager() {
   const save = async () => {
     const values = await form.validateFields();
     try {
-      await api("/api/admin/categories", { method: "PUT", json: { ...values, parent: values.parent || null } });
+      await CategoryService.upsert(values);
       message.success("Đã lưu chuyên mục");
       setEditing(undefined);
       load();
@@ -52,7 +52,7 @@ export default function CategoryManager() {
 
   const remove = async (slug: string) => {
     try {
-      await api(`/api/admin/categories?slug=${encodeURIComponent(slug)}`, { method: "DELETE" });
+      await CategoryService.remove(slug);
       message.success("Đã xóa chuyên mục");
       load();
     } catch (e) {

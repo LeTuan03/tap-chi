@@ -5,7 +5,7 @@ import { App, Button, Layout, Menu, Space, Typography } from "antd";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import type { ReactNode } from "react";
-import { api } from "@/lib/admin-client";
+import { AuthService } from "@/lib/services";
 
 const { Sider, Header, Content } = Layout;
 
@@ -23,7 +23,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
   const selected = items.map((i) => i.key).filter((k) => (k === "/admin" ? pathname === "/admin" : pathname.startsWith(k)));
 
   const logout = async () => {
-    await api("/api/admin/auth", { method: "DELETE" });
+    await AuthService.logout();
     message.success("Đã đăng xuất");
     router.replace("/admin/login");
   };

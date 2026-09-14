@@ -4,25 +4,18 @@ import { EditOutlined, EyeOutlined, FileDoneOutlined, FileTextOutlined, FolderOu
 import { App, Button, Card, Col, Row, Space, Statistic, Table, Tag, Typography } from "antd";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { api } from "@/lib/admin-client";
+import { StatsService, type DashboardStats as Stats } from "@/lib/services";
 import type { Article } from "@/lib/types";
 import { articlePath, formatDateTime } from "@/lib/utils";
 
-interface Stats {
-  articles: number;
-  published: number;
-  drafts: number;
-  categories: number;
-  totalViews: number;
-  latest: Article[];
-}
+
 
 export default function Dashboard() {
   const { message } = App.useApp();
   const [stats, setStats] = useState<Stats | null>(null);
 
   useEffect(() => {
-    api<Stats>("/api/admin/stats")
+    StatsService.getDashboard()
       .then(setStats)
       .catch((e) => message.error((e as Error).message));
   }, [message]);

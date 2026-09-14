@@ -10,12 +10,10 @@ export function sanitizeHtml(html: string): string {
     .replace(/(href|src)\s*=\s*(["']?)\s*javascript:[^"'>\s]*/gi, "$1=$2#");
 }
 
+import { ARTICLE_STATUSES, ARTICLE_TYPES, MENU_PLACEMENTS } from "./constants";
+
 type ArticleInput = Omit<Article, "id" | "createdAt" | "updatedAt">;
 type Result<T> = { ok: true; value: T } | { ok: false; errors: string[] };
-
-const TYPES: ArticleType[] = ["article", "photo", "video"];
-const STATUSES: ArticleStatus[] = ["published", "draft"];
-const MENUS: MenuPlacement[] = ["main", "more", "hidden"];
 
 function str(v: unknown, max = 100000): string {
   return typeof v === "string" ? v.trim().slice(0, max) : "";
@@ -36,8 +34,8 @@ export async function parseArticleInput(body: unknown, existing?: Article): Prom
   if (!category) errors.push("Chưa chọn chuyên mục");
   else if (!(await db.categories.get(category))) errors.push(`Chuyên mục "${category}" không tồn tại`);
 
-  const type = TYPES.includes(b.type as ArticleType) ? (b.type as ArticleType) : "article";
-  const status = STATUSES.includes(b.status as ArticleStatus) ? (b.status as ArticleStatus) : "draft";
+  const type = ARTICLE_TYPES.includes(b.type as ArticleType) ? (b.type as ArticleType) : "article";
+  const status = ARTICLE_STATUSES.includes(b.status as ArticleStatus) ? (b.status as ArticleStatus) : "draft";
 
   const publishedAtRaw = str(b.publishedAt, 40);
   const publishedAt = publishedAtRaw ? new Date(publishedAtRaw) : new Date();
@@ -89,7 +87,7 @@ export function parseCategoryInput(body: unknown): Result<Category> {
   if (!slug) errors.push("Không tạo được slug");
   const parent = str(b.parent, 120) || null;
   if (parent && parent === slug) errors.push("Chuyên mục không thể là cha của chính nó");
-  const menu = MENUS.includes(b.menu as MenuPlacement) ? (b.menu as MenuPlacement) : "main";
+  const menu = MENU_PLACEMENTS.includes(b.menu as MenuPlacement) ? (b.menu as MenuPlacement) : "main";
   const order = Number(b.order);
   if (errors.length) return { ok: false, errors };
   return { ok: true, value: { slug, name, parent, description: str(b.description, 320), menu, order: Number.isFinite(order) ? order : 0 } };

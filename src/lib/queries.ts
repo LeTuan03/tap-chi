@@ -7,7 +7,7 @@ import { db } from "./db";
 import type { Article, Category, CategoryBlock, HomeData, Paged } from "./types";
 import { normalizeForSearch } from "./utils";
 
-export const PAGE_SIZE = 18;
+import { PUBLIC_PAGE_SIZE as PAGE_SIZE } from "./constants";
 
 const PUBLISHED = () => ({ status: "published" as const, publishedBefore: new Date() });
 
